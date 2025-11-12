@@ -1,0 +1,761 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SYSTEM PENETRATION REPORT - SABARI425</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;700;900&family=Source+Code+Pro:wght@300;400;500;600&display=swap');
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Source Code Pro', monospace;
+                background: linear-gradient(135deg, #0a0a0a 0%, #001a00 50%, #0a1a0a 100%);
+                min-height: 100vh;
+                margin: 0;
+                padding: 0;
+                color: #00ff00;
+                line-height: 1.6;
+                overflow-x: hidden;
+                font-weight: 400;
+            }
+
+            .matrix-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: 
+                    radial-gradient(circle at 20% 80%, rgba(0, 255, 0, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(0, 200, 0, 0.02) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(100, 255, 100, 0.01) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            .scan-line {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, #00ff00, #00cc00, #00ff00, transparent);
+                animation: scan 3s linear infinite;
+                box-shadow: 0 0 10px #00ff00;
+                z-index: 1000;
+            }
+
+            @keyframes scan {
+                0% { top: 0%; opacity: 0; }
+                10% { opacity: 1; }
+                90% { opacity: 1; }
+                100% { top: 100%; opacity: 0; }
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 20px;
+                position: relative;
+            }
+
+            .header {
+                background: rgba(0, 20, 0, 0.7);
+                backdrop-filter: blur(10px);
+                padding: 30px;
+                margin-bottom: 30px;
+                text-align: center;
+                border: 1px solid #00ff00;
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 0, 0.3),
+                    inset 0 0 30px rgba(0, 255, 0, 0.1);
+                position: relative;
+                overflow: hidden;
+                border-radius: 15px;
+            }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+                animation: headerGlow 6s linear infinite;
+            }
+
+            @keyframes headerGlow {
+                0% { left: -100%; }
+                100% { left: 100%; }
+            }
+
+            .header h1 {
+                font-family: 'Orbitron', monospace;
+                color: #00ff00;
+                font-size: 2.8em;
+                margin-bottom: 15px;
+                font-weight: 700;
+                text-shadow: 
+                    0 0 10px #00ff00,
+                    0 0 20px #00cc00;
+                letter-spacing: 3px;
+            }
+
+            .creator {
+                font-family: 'Share Tech Mono', monospace;
+                color: #00ff00;
+                font-size: 1.3em;
+                margin-bottom: 20px;
+                font-weight: 500;
+                text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+                letter-spacing: 2px;
+            }
+
+            .header p {
+                color: #00cc00;
+                font-size: 1em;
+                margin: 5px 0;
+                font-weight: 300;
+                text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            }
+
+            .health-score {
+                display: inline-block;
+                background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+                color: #000000;
+                padding: 12px 25px;
+                margin-top: 15px;
+                font-weight: 700;
+                font-family: 'Share Tech Mono', monospace;
+                border: 2px solid #00ff00;
+                text-shadow: 0 0 5px #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+                font-size: 1.1em;
+                letter-spacing: 1px;
+            }
+
+            .section {
+                background: rgba(0, 15, 0, 0.6);
+                backdrop-filter: blur(10px);
+                padding: 25px;
+                margin-bottom: 25px;
+                border: 1px solid #00cc00;
+                position: relative;
+                transition: all 0.3s ease;
+                border-radius: 12px;
+                box-shadow: 
+                    0 0 20px rgba(0, 255, 0, 0.2),
+                    inset 0 0 20px rgba(0, 255, 0, 0.05);
+            }
+
+            .section::before {
+                content: '>';
+                position: absolute;
+                left: 15px;
+                top: 25px;
+                color: #00ff00;
+                font-weight: bold;
+                font-size: 1.2em;
+                text-shadow: 0 0 10px #00ff00;
+            }
+
+            .section:hover {
+                border-color: #00ff00;
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 0, 0.3),
+                    inset 0 0 30px rgba(0, 255, 0, 0.1);
+                transform: translateY(-2px);
+            }
+
+            .section h2 {
+                font-family: 'Share Tech Mono', monospace;
+                color: #00ff00;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+                font-size: 1.4em;
+                font-weight: 600;
+                border-bottom: 2px solid #00cc00;
+                margin-left: 25px;
+                text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+                letter-spacing: 1px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                background: rgba(0, 10, 0, 0.5);
+                font-size: 0.9em;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            }
+
+            th {
+                background: linear-gradient(135deg, #00cc00 0%, #00ff00 100%);
+                color: #000000;
+                padding: 15px 12px;
+                text-align: left;
+                font-weight: 700;
+                font-family: 'Share Tech Mono', monospace;
+                border: 1px solid #00ff00;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 0.85em;
+            }
+
+            td {
+                padding: 12px 12px;
+                border: 1px solid #006600;
+                color: #00cc00;
+                font-weight: 400;
+                transition: all 0.2s ease;
+            }
+
+            tr:nth-child(even) {
+                background: rgba(0, 20, 0, 0.3);
+            }
+
+            tr:hover {
+                background: rgba(0, 255, 0, 0.1);
+                color: #00ff00;
+            }
+
+            .status-active {
+                color: #00ff00;
+                font-weight: 600;
+                text-shadow: 0 0 8px #00ff00;
+            }
+
+            .status-inactive {
+                color: #ff4444;
+                font-weight: 600;
+                text-shadow: 0 0 8px #ff4444;
+            }
+
+            .status-warning {
+                color: #ffff00;
+                font-weight: 600;
+                text-shadow: 0 0 8px #ffff00;
+            }
+
+            .status-critical {
+                color: #ff0000;
+                font-weight: 600;
+                text-shadow: 0 0 10px #ff0000;
+            }
+
+            .status-notice {
+                color: #ffaa00;
+                font-weight: 600;
+                text-shadow: 0 0 8px #ffaa00;
+            }
+
+            .metric-value {
+                font-family: 'Source Code Pro', monospace;
+                background: rgba(0, 255, 0, 0.1);
+                padding: 4px 8px;
+                color: #00ff00;
+                border: 1px solid #00cc00;
+                font-weight: 500;
+                border-radius: 4px;
+            }
+
+            .footer {
+                text-align: center;
+                color: #00cc00;
+                margin-top: 40px;
+                padding: 25px;
+                background: rgba(0, 20, 0, 0.7);
+                backdrop-filter: blur(10px);
+                border: 1px solid #00cc00;
+                font-size: 0.9em;
+                border-radius: 12px;
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            }
+
+            .scroll-container {
+                overflow-x: auto;
+                margin: 20px 0;
+                border: 1px solid #00cc00;
+                padding: 8px;
+                background: rgba(0, 10, 0, 0.5);
+                border-radius: 8px;
+                box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.1);
+            }
+
+            .scroll-table {
+                min-width: 1200px;
+            }
+
+            .task-manager-table {
+                min-width: 1800px;
+            }
+
+            .performance-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-top: 20px;
+            }
+
+            .performance-card {
+                background: rgba(0, 20, 0, 0.6);
+                backdrop-filter: blur(10px);
+                padding: 20px;
+                border: 1px solid #00cc00;
+                position: relative;
+                overflow: hidden;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .performance-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            }
+
+            .performance-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: linear-gradient(180deg, #00ff00 0%, #00cc00 100%);
+            }
+
+            .performance-card h3 {
+                font-family: 'Share Tech Mono', monospace;
+                color: #00ff00;
+                margin-bottom: 12px;
+                font-size: 1em;
+                font-weight: 600;
+                text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+            }
+
+            .performance-value {
+                font-size: 1.8em;
+                font-weight: 700;
+                color: #00ff00;
+                margin: 10px 0;
+                text-shadow: 0 0 10px #00ff00;
+                font-family: 'Share Tech Mono', monospace;
+            }
+
+            .performance-details {
+                color: #00cc00;
+                font-size: 0.85em;
+                line-height: 1.4;
+            }
+
+            .terminal-prompt {
+                color: #00ff00;
+                margin-right: 8px;
+                font-weight: 600;
+            }
+
+            .blink {
+                animation: blink 1.5s infinite;
+            }
+
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0.3; }
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    padding: 15px;
+                }
+
+                .header h1 {
+                    font-size: 2em;
+                }
+
+                .performance-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                table {
+                    font-size: 0.8em;
+                }
+
+                th, td {
+                    padding: 8px 10px;
+                }
+            }
+
+            /* Matrix rain effect */
+            .matrix-rain {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -2;
+                opacity: 0.03;
+            }
+
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: rgba(0, 20, 0, 0.8);
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #00ff00 0%, #00cc00 100%);
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(180deg, #00ff00 0%, #009900 100%);
+            }
+
+            /* Typewriter effect for headers */
+            .typewriter {
+                overflow: hidden;
+                border-right: 3px solid #00ff00;
+                white-space: nowrap;
+                animation: typing 4s steps(40, end), blink-caret 1s step-end infinite;
+            }
+
+            @keyframes typing {
+                from { width: 0 }
+                to { width: 100% }
+            }
+
+            @keyframes blink-caret {
+                from, to { border-color: transparent }
+                50% { border-color: #00ff00 }
+            }
+
+            /* Hacker corner elements */
+            .corner {
+                position: fixed;
+                width: 50px;
+                height: 50px;
+                border: 2px solid #00ff00;
+                z-index: 999;
+            }
+
+            .corner-tl {
+                top: 20px;
+                left: 20px;
+                border-right: none;
+                border-bottom: none;
+            }
+
+            .corner-tr {
+                top: 20px;
+                right: 20px;
+                border-left: none;
+                border-bottom: none;
+            }
+
+            .corner-bl {
+                bottom: 20px;
+                left: 20px;
+                border-right: none;
+                border-top: none;
+            }
+
+            .corner-br {
+                bottom: 20px;
+                right: 20px;
+                border-left: none;
+                border-top: none;
+            }
+
+            /* Binary rain animation */
+            @keyframes binaryRain {
+                0% { transform: translateY(-100px); opacity: 0; }
+                10% { opacity: 1; }
+                90% { opacity: 1; }
+                100% { transform: translateY(100vh); opacity: 0; }
+            }
+
+            .binary {
+                position: fixed;
+                color: #00ff00;
+                font-family: 'Share Tech Mono', monospace;
+                font-size: 14px;
+                animation: binaryRain linear infinite;
+                z-index: -1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="matrix-bg"></div>
+        <div class="scan-line"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        <div class="matrix-rain" id="matrixRain"></div>
+
+        <div class="container">
+            <div class="header">
+                <h1>SYSTEM PENETRATION REPORT</h1>
+                <div class="creator">SABARI425 SECURITY</div>
+                <p>> SCAN INITIATED: 2025-11-12 18:27:00</p>
+                <p>> TARGET: DESKTOP-EU32D3F | PLATFORM: Windows-11-10.0.26200-SP0</p>
+                <div class="health-score">
+                    SYSTEM INTEGRITY: 85/100
+                </div>
+            </div>
+    
+            <div class="section">
+                <h2>> SYSTEM OVERVIEW</h2>
+        <table><tr><td><span class="terminal-prompt">></span> Host Name</td><td class="metric-value">DESKTOP-EU32D3F</td></tr><tr><td><span class="terminal-prompt">></span> Processor</td><td class="metric-value">AMD64 Family 23 Model 24 Stepping 1, AuthenticAMD</td></tr><tr><td><span class="terminal-prompt">></span> Platform</td><td class="metric-value">Windows-11-10.0.26200-SP0</td></tr><tr><td><span class="terminal-prompt">></span> Architecture</td><td class="metric-value">64bit</td></tr><tr><td><span class="terminal-prompt">></span> System Type</td><td class="metric-value">AMD64</td></tr><tr><td><span class="terminal-prompt">></span> Python Version</td><td class="metric-value">3.13.5</td></tr><tr><td><span class="terminal-prompt">></span> Total RAM</td><td class="metric-value">5.94 GB</td></tr><tr><td><span class="terminal-prompt">></span> Available RAM</td><td class="metric-value">0.61 GB</td></tr><tr><td><span class="terminal-prompt">></span> RAM Usage</td><td class="metric-value">89.8%</td></tr><tr><td><span class="terminal-prompt">></span> System Uptime</td><td class="metric-value">2 days, 22:21:38</td></tr><tr><td><span class="terminal-prompt">></span> System Health</td><td class="metric-value">85/100</td></tr><tr><td><span class="terminal-prompt">></span> OS Name</td><td class="metric-value">Microsoft Windows 11 Home Single Language</td></tr><tr><td><span class="terminal-prompt">></span> OS Version</td><td class="metric-value">Insyde F.41, 24-10-2024</td></tr><tr><td><span class="terminal-prompt">></span> Manufacturer</td><td class="metric-value">HP</td></tr><tr><td><span class="terminal-prompt">></span> Model</td><td class="metric-value">HP Laptop 15s-gr0xxx</td></tr><tr><td><span class="terminal-prompt">></span> Physical Cores</td><td class="metric-value">2</td></tr><tr><td><span class="terminal-prompt">></span> Logical Cores</td><td class="metric-value">4</td></tr></table></div>
+            <div class="section">
+                <h2>> HARDWARE DETAILS</h2>
+        <table><thead><tr><th>Category</th><th>Detail</th></tr></thead><tbody><tr><td>BIOS_MANUFACTURER</td><td>Insyde</td></tr><tr><td>BIOS_VERSION</td><td>20241024000000.000000+000</td></tr><tr><td>BIOS_SERIAL</td><td>CND11184GC</td></tr><tr><td>BIOS_DATE</td><td>HPQOEM - 2</td></tr><tr><td>MOTHERBOARD_MANUFACTURER</td><td>HP</td></tr><tr><td>MOTHERBOARD_PRODUCT</td><td>87D2</td></tr><tr><td>MOTHERBOARD_VERSION</td><td>PKEFBF21UEY1PI</td></tr><tr><td>MOTHERBOARD_SERIAL</td><td>38.28</td></tr><tr><td>SYSTEM_UUID</td><td>AC22F4D3-D487-EB11-810A-14CB1965D197</td></tr><tr><td>BATTERY_PERCENT</td><td>91%</td></tr><tr><td>POWER_PLUGGED</td><td>Yes</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> STORAGE ANALYSIS</h2>
+        <table><thead><tr><th>Device</th><th>Mountpoint</th><th>File System</th><th>Total Size</th><th>Used</th><th>Free</th><th>Usage</th><th>Status</th></tr></thead><tbody><tr><td>C:\</td><td>C:\</td><td>NTFS</td><td>232.05 GB</td><td>128.38 GB</td><td>103.67 GB</td><td>55.3%</td><td class="status-active">HEALTHY</td></tr><tr><td>D:\</td><td>D:\</td><td>NTFS</td><td>464.70 GB</td><td>171.94 GB</td><td>292.76 GB</td><td>37.0%</td><td class="status-active">HEALTHY</td></tr><tr><td>E:\</td><td>E:\</td><td>NTFS</td><td>285.33 GB</td><td>119.29 GB</td><td>166.03 GB</td><td>41.8%</td><td class="status-active">HEALTHY</td></tr><tr><td>G:\</td><td>G:\</td><td>FAT32</td><td>15.00 GB</td><td>11.01 GB</td><td>3.99 GB</td><td>73.4%</td><td class="status-active">HEALTHY</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> GRAPHICS CARD INFORMATION</h2>
+        <table><thead><tr><th>Graphics Card</th><th>Adapter RAM</th><th>Driver Version</th><th>Video Processor</th><th>Current Resolution</th></tr></thead><tbody><tr><td>30.0.13044.0</td><td>UNKNOWN</td><td>1920 x 1080 x 4294967296 colors</td><td>AMD Radeon Graphics Processor (0x15D8)</td><td>UNKNOWN</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> NETWORK ANALYSIS</h2>
+        <div class="scroll-container"><table class="scroll-table"><thead><tr><th>Interface</th><th>Status</th><th>MTU</th><th>Speed</th><th>MAC Address</th><th>IPv4 Addresses</th><th>IPv6 Addresses</th><th>Data Sent</th><th>Data Received</th><th>Packets Sent</th><th>Packets Received</th></tr></thead><tbody><tr><td>Ethernet</td><td class="status-active">INACTIVE</td><td>1500</td><td>UNKNOWN</td><td>14-CB-19-65-D1-97</td><td>169.254.153.65</td><td>fe80::b083:5de0:9add:9f6a</td><td>0.0 MB</td><td>0.0 MB</td><td>0</td><td>0</td></tr><tr><td>Local Area Connection* 1</td><td class="status-active">INACTIVE</td><td>1500</td><td>UNKNOWN</td><td>66-6C-80-66-9A-F9</td><td>169.254.197.119</td><td>fe80::f62e:9f32:a8d9:e7f7</td><td>0.0 MB</td><td>0.0 MB</td><td>0</td><td>0</td></tr><tr><td>Local Area Connection* 2</td><td class="status-active">INACTIVE</td><td>1500</td><td>UNKNOWN</td><td>E6-6C-80-66-9A-F9</td><td>169.254.125.155</td><td>fe80::75fe:cb25:2400:2b5c</td><td>0.0 MB</td><td>0.0 MB</td><td>0</td><td>0</td></tr><tr><td>Wi-Fi</td><td class="status-active">ACTIVE</td><td>1500</td><td>65 Mbps</td><td>64-6C-80-66-9A-F9</td><td>10.12.66.125</td><td>fe80::cc0d:ecbe:ba3e:5362</td><td>6.6 MB</td><td>87.8 MB</td><td>34,655</td><td>288,280</td></tr><tr><td>Bluetooth Network Connection</td><td class="status-active">INACTIVE</td><td>1500</td><td>3 Mbps</td><td>64-6C-80-66-9A-FA</td><td>169.254.130.128</td><td>fe80::107b:dee8:7597:bb06</td><td>0.0 MB</td><td>0.0 MB</td><td>0</td><td>0</td></tr><tr><td>Loopback Pseudo-Interface 1</td><td class="status-active">ACTIVE</td><td>1500</td><td>1073 Mbps</td><td>NONE</td><td>127.0.0.1</td><td>::1</td><td>0.0 MB</td><td>0.0 MB</td><td>0</td><td>0</td></tr></tbody></table></div></div>
+            <div class="section">
+                <h2>> NETWORK CONNECTIONS</h2>
+        <div class="scroll-container"><table class="scroll-table"><thead><tr><th>Protocol</th><th>Local Address</th><th>Remote Address</th><th>Status</th><th>PID</th></tr></thead><tbody><tr><td>SOCK_STREAM</td><td>10.12.66.125:57433</td><td>142.251.220.10:443</td><td>ESTABLISHED</td><td>12112</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:49273</td><td>199.232.46.172:80</td><td>ESTABLISHED</td><td>9072</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:50253</td><td>4.145.79.81:443</td><td>ESTABLISHED</td><td>5144</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:57532</td><td>142.250.67.170:443</td><td>ESTABLISHED</td><td>2832</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:58013</td><td>199.232.114.172:80</td><td>ESTABLISHED</td><td>9072</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:52742</td><td>199.232.114.172:80</td><td>ESTABLISHED</td><td>9072</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:61838</td><td>142.250.192.78:443</td><td>ESTABLISHED</td><td>15864</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:57531</td><td>142.250.67.170:443</td><td>ESTABLISHED</td><td>2832</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:53606</td><td>199.232.114.172:80</td><td>ESTABLISHED</td><td>9072</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:60402</td><td>18.245.162.71:443</td><td>ESTABLISHED</td><td>15864</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:50902</td><td>199.232.114.172:80</td><td>ESTABLISHED</td><td>9072</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:59591</td><td>142.250.207.138:443</td><td>ESTABLISHED</td><td>2832</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:59061</td><td>140.82.113.26:443</td><td>ESTABLISHED</td><td>15864</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:59000</td><td>142.250.195.42:443</td><td>ESTABLISHED</td><td>15864</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:51734</td><td>216.239.36.223:443</td><td>ESTABLISHED</td><td>12112</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:56582</td><td>216.239.38.223:443</td><td>ESTABLISHED</td><td>2832</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:52741</td><td>199.232.114.172:80</td><td>ESTABLISHED</td><td>9072</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:64162</td><td>20.207.73.82:443</td><td>ESTABLISHED</td><td>15864</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:60159</td><td>148.113.20.113:443</td><td>ESTABLISHED</td><td>4844</td></tr><tr><td>SOCK_STREAM</td><td>10.12.66.125:53802</td><td>18.97.36.65:443</td><td>ESTABLISHED</td><td>15864</td></tr></tbody></table></div></div>
+            <div class="section">
+                <h2>> WIFI SECURITY ANALYSIS</h2>
+        <div class="scroll-container"><table class="scroll-table"><thead><tr><th>SSID</th><th>Password</th><th>Security</th><th>Connection Mode</th><th>Status</th></tr></thead><tbody><tr><td>Galaxy F15 5G</td><td class="status-active">Hari8699!</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>iQOO Z7 Pro 5G</td><td class="status-active">22110621</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Ahh Vaalthukkal Vaalthukkal</td><td>Not stored or encrypted</td><td>Unknown</td><td>Unknown</td><td class="status-inactive">NO_PASSWORD</td></tr><tr><td>AmritaClass</td><td>Not stored or encrypted</td><td>WPA2-Enterprise</td><td>Connect automatically</td><td class="status-inactive">NO_PASSWORD</td></tr><tr><td>AndroidAP_5261</td><td class="status-active">Hotspotpassword</td><td>WPA3-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Amrita</td><td>Not stored or encrypted</td><td>WPA2-Enterprise</td><td>Connect automatically</td><td class="status-inactive">NO_PASSWORD</td></tr><tr><td>vivo T3x 5G</td><td class="status-active">123456789</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>ARUN2006</td><td class="status-active">9164162545</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>iQOO Neo 10R</td><td class="status-active">12345678</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>vivo Y200e 5G</td><td class="status-active">12345678</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>S. Sabaripoornesh's Galaxy A03s</td><td class="status-active">chku5435</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Sabari Poornesh S</td><td class="status-active">HarI1234</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Amrita-5G-B122</td><td>Not stored or encrypted</td><td>WPA2-Enterprise</td><td>Connect automatically</td><td class="status-inactive">NO_PASSWORD</td></tr><tr><td>x9c</td><td>Not stored or encrypted</td><td>Unknown</td><td>Unknown</td><td class="status-inactive">NO_PASSWORD</td></tr><tr><td>I know u want password 🔑</td><td class="status-active">password</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Divyesh</td><td class="status-active">12345678</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>vivo Y300 5G</td><td class="status-active">13691369</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Sanjay payaluga</td><td class="status-active">vishal23</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>SUDHAMSU’s iphone</td><td class="status-active">1234567890</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>motoedge50fusion_4543</td><td class="status-active">ftff3344</td><td>WPA3-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Killer King 👑 Infinix</td><td class="status-active">9843728034</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>iQOO Neo9 Pro</td><td class="status-active">12345678</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Vishal's A55</td><td class="status-active">123456789</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Redmi 10A</td><td class="status-active">7994885211</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>RISHI.G(747)</td><td class="status-active">rishi.125478</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>HONOR X9c</td><td class="status-active">sanjay04</td><td>WPA2-Personal</td><td>Connect automatically</td><td>PASSWORD_FOUND</td></tr><tr><td>Service_2.4GHz</td><td class="status-active">Pass*987</td><td>WPA2-Personal</td><td>Connect manually</td><td>PASSWORD_FOUND</td></tr></tbody></table></div></div>
+            <div class="section">
+                <h2>> USER ACCOUNTS</h2>
+        <table><thead><tr><th>Username</th><th>Full Name</th><th>Account Active</th><th>Last Logon</th><th>Password Last Set</th><th>Account Expires</th><th>Local Group Memberships</th><th>Password Required</th><th>Workstations Allowed</th></tr></thead><tbody><tr><td>Administrator</td><td></td><td class="status-inactive">No</td><td>Never</td><td class="status-active">12-11-2025 18:26:24</td><td>Never</td><td>*Administrators</td><td class="status-active">Yes</td><td>All</td></tr><tr><td>DefaultAccount</td><td></td><td class="status-inactive">No</td><td>Never</td><td class="status-active">12-11-2025 18:26:24</td><td>Never</td><td>*System Managed Accoun</td><td class="status-active">No</td><td>All</td></tr><tr><td>donha</td><td>Hari Prasanth</td><td class="status-active">Yes</td><td>Never</td><td class="status-active">15-06-2025 22:09:32</td><td>Never</td><td>*Administrators       *Users</td><td class="status-active">Yes</td><td>All</td></tr><tr><td>Guest</td><td></td><td class="status-inactive">No</td><td>Never</td><td class="status-active">12-11-2025 18:26:24</td><td>Never</td><td>*Guests</td><td class="status-active">No</td><td>All</td></tr><tr><td>Hp</td><td></td><td class="status-active">Yes</td><td>16-06-2025 14:30:46</td><td class="status-active">15-06-2025 19:49:22</td><td>Never</td><td>*Administrators       *Users</td><td class="status-active">No</td><td>All</td></tr><tr><td>WDAGUtilityAccount</td><td></td><td class="status-inactive">No</td><td>Never</td><td class="status-active">15-06-2025 13:55:46</td><td>Never</td><td></td><td class="status-active">Yes</td><td>All</td></tr><tr><td>WsiAccount</td><td></td><td class="status-inactive">No</td><td>03-08-2025 14:35:34</td><td class="status-active">03-08-2025 14:35:34</td><td>Never</td><td>*Users</td><td class="status-active">No</td><td>All</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> SYSTEM SERVICES</h2>
+        <div class="scroll-container"><table class="scroll-table"><thead><tr><th>Service Name</th><th>Display Name</th><th>Status</th><th>Startup Type</th><th>PID</th><th>Binary Path</th></tr></thead><tbody><tr><td>ADPSvc</td><td>ADPSvc</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\svchost.exe -k LocalServiceAnd...</td></tr><tr><td>ALG</td><td>Application Layer Gateway Service</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\System32\alg.exe</td></tr><tr><td>AMD External Events Utility</td><td>AMD External Events Utility</td><td class="status-active">running</td><td>N/A</td><td>2776</td><td>C:\WINDOWS\System32\DriverStore\FileRepository\u03...</td></tr><tr><td>AnyDesk</td><td>AnyDesk Service</td><td class="status-active">running</td><td>N/A</td><td>4844</td><td>"C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --ser...</td></tr><tr><td>AppIDSvc</td><td>Application Identity</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\svchost.exe -k LocalServiceNet...</td></tr><tr><td>Appinfo</td><td>Application Information</td><td class="status-active">running</td><td>N/A</td><td>8148</td><td>C:\WINDOWS\system32\svchost.exe -k netsvcs -p</td></tr><tr><td>AppReadiness</td><td>App Readiness</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\System32\svchost.exe -k AppReadiness -p</td></tr><tr><td>AppXSvc</td><td>AppX Deployment Service (AppXSVC)</td><td class="status-active">running</td><td>N/A</td><td>13056</td><td>C:\WINDOWS\system32\svchost.exe -k wsappx -p</td></tr><tr><td>ApxSvc</td><td>Windows Virtual Audio Device Proxy Service</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\svchost.exe -k LocalService -p</td></tr><tr><td>AudioEndpointBuilder</td><td>Windows Audio Endpoint Builder</td><td class="status-active">running</td><td>N/A</td><td>3148</td><td>C:\WINDOWS\System32\svchost.exe -k LocalSystemNetw...</td></tr><tr><td>Audiosrv</td><td>Windows Audio</td><td class="status-active">running</td><td>N/A</td><td>3600</td><td>C:\WINDOWS\System32\svchost.exe -k LocalServiceNet...</td></tr><tr><td>autotimesvc</td><td>Cellular Time</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\svchost.exe -k autoTimeSvc</td></tr><tr><td>AxInstSV</td><td>ActiveX Installer (AxInstSV)</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\svchost.exe -k AxInstSVGroup</td></tr><tr><td>BDESVC</td><td>BitLocker Drive Encryption Service</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\System32\svchost.exe -k netsvcs -p</td></tr><tr><td>BFE</td><td>Base Filtering Engine</td><td class="status-active">running</td><td>N/A</td><td>4640</td><td>C:\WINDOWS\system32\svchost.exe -k LocalServiceNoN...</td></tr><tr><td>BITS</td><td>Background Intelligent Transfer Service</td><td class="status-active">running</td><td>N/A</td><td>9488</td><td>C:\WINDOWS\System32\svchost.exe -k netsvcs -p</td></tr><tr><td>brave</td><td>Brave Update Service (brave)</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>"C:\Program Files (x86)\BraveSoftware\Update\Brave...</td></tr><tr><td>BraveElevationService</td><td>Brave Elevation Service (BraveElevationService)</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>"C:\Program Files\BraveSoftware\Brave-Browser\Appl...</td></tr><tr><td>bravem</td><td>Brave Update Service (bravem)</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>"C:\Program Files (x86)\BraveSoftware\Update\Brave...</td></tr><tr><td>BrokerInfrastructure</td><td>Background Tasks Infrastructure Service</td><td class="status-active">running</td><td>N/A</td><td>1404</td><td>C:\WINDOWS\system32\svchost.exe -k DcomLaunch -p</td></tr><tr><td>Browser</td><td>Computer Browser</td><td class="status-active">running</td><td>N/A</td><td>4412</td><td>C:\WINDOWS\System32\svchost.exe -k netsvcs -p</td></tr><tr><td>BTAGService</td><td>Bluetooth Audio Gateway Service</td><td class="status-active">running</td><td>N/A</td><td>1856</td><td>C:\WINDOWS\system32\svchost.exe -k LocalServiceNet...</td></tr><tr><td>BthAvctpSvc</td><td>AVCTP service</td><td class="status-active">running</td><td>N/A</td><td>1860</td><td>C:\WINDOWS\system32\svchost.exe -k LocalService -p</td></tr><tr><td>bthserv</td><td>Bluetooth Support Service</td><td class="status-active">running</td><td>N/A</td><td>1872</td><td>C:\WINDOWS\system32\svchost.exe -k LocalService -p</td></tr><tr><td>camsvc</td><td>Capability Access Manager Service</td><td class="status-active">running</td><td>N/A</td><td>6680</td><td>C:\WINDOWS\system32\svchost.exe -k osprivacy -p</td></tr><tr><td>CDPSvc</td><td>Connected Devices Platform Service</td><td class="status-active">running</td><td>N/A</td><td>8576</td><td>C:\WINDOWS\system32\svchost.exe -k LocalService -p</td></tr><tr><td>CertPropSvc</td><td>Certificate Propagation</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\svchost.exe -k netsvcs</td></tr><tr><td>ClickToRunSvc</td><td>Microsoft Office Click-to-Run Service</td><td class="status-active">running</td><td>N/A</td><td>4892</td><td>"C:\Program Files\Common Files\Microsoft Shared\Cl...</td></tr><tr><td>ClipSVC</td><td>Client License Service (ClipSVC)</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\System32\svchost.exe -k wsappx -p</td></tr><tr><td>COMSysApp</td><td>COM+ System Application</td><td class="status-inactive">stopped</td><td>N/A</td><td>None</td><td>C:\WINDOWS\system32\dllhost.exe /Processid:{02D4B3...</td></tr></tbody></table></div></div>
+            <div class="section">
+                <h2>> INSTALLED SOFTWARE</h2>
+        <div class="scroll-container"><table class="scroll-table"><thead><tr><th>Software Name</th><th>Version</th><th>Publisher</th><th>Install Date</th></tr></thead><tbody><tr><td>AnyDesk ad 7.0.15</td><td>AnyDesk</td><td>Software</td><td>GmbH</td></tr><tr><td>Brave 142.1.84.135 Brave</td><td>Software</td><td>Inc</td><td>20251107</td></tr><tr><td>Dev-C++</td><td>5.11</td><td>Bloodshed</td><td>Software</td></tr><tr><td>Google Chrome 142.0.7444.61</td><td>Google</td><td>LLC</td><td>20251107</td></tr><tr><td>Microsoft Edge 142.0.3595.53</td><td>Microsoft</td><td>Corporation</td><td>20251102</td></tr><tr><td>Microsoft Edge WebView2 Runtime 142.0.3595.53</td><td>Microsoft</td><td>Corporation</td><td>20251106</td></tr><tr><td>PyCharm 2025.1.2</td><td>251.26094.141</td><td>JetBrains</td><td>s.r.o.</td></tr><tr><td>PyCharm Community Edition 2025.1.2</td><td>251.26094.141</td><td>JetBrains</td><td>s.r.o.</td></tr><tr><td>Windows 11 Installation Assistant</td><td>1.4.19041.5003</td><td>Microsoft</td><td>Corporation</td></tr><tr><td>Microsoft Visual C++ 2015-2022 Redistributable (x64) - 14.32.31326</td><td>14.32.31326.0</td><td>Microsoft</td><td>Corporation</td></tr><tr><td>Chrome Remote Desktop Host 143.0.7499.7</td><td>Google</td><td>LLC</td><td>20251112</td></tr><tr><td>Python Launcher 3.13.5150.0 Python</td><td>Software</td><td>Foundation</td><td>20250627</td></tr><tr><td>Teams Machine-Wide Installer 1.4.0.19572</td><td>Microsoft</td><td>Corporation</td><td>20250615</td></tr></tbody></table></div></div>
+            <div class="section">
+                <h2>> SYSTEM DRIVERS</h2>
+        <table><thead><tr><th>Module Name</th><th>Display Name</th><th>Driver Type</th><th>Start Mode</th><th>State</th><th>Status</th></tr></thead><tbody><tr><td>1394ohci</td><td>1394 OHCI Compliant Host Controller</td><td>1394 OHCI Compliant Host Controller</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>3ware</td><td>3ware</td><td>3ware</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>ACPI</td><td>Microsoft ACPI Driver</td><td>Microsoft ACPI Driver</td><td>Kernel </td><td>Boot</td><td class="status-active">Running</td></tr><tr><td>AcpiAudioCompositorInbox</td><td>ACPI Audio Compositor Driver</td><td>ACPI Audio Compositor Driver</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>AcpiDev</td><td>ACPI Devices driver</td><td>ACPI Devices driver</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>acpiex</td><td>Microsoft ACPIEx Driver</td><td>Microsoft ACPIEx Driver</td><td>Kernel </td><td>Boot</td><td class="status-active">Running</td></tr><tr><td>acpipagr</td><td>ACPI Processor Aggregator Driver</td><td>ACPI Processor Aggregator Driver</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>AcpiPmi</td><td>ACPI Power Meter Driver</td><td>ACPI Power Meter Driver</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>acpitime</td><td>ACPI Wake Alarm Driver</td><td>ACPI Wake Alarm Driver</td><td>Kernel </td><td>Manual</td><td class="status-active">Running</td></tr><tr><td>Acx01000</td><td>Acx01000</td><td>Acx01000</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>ADP80XX</td><td>ADP80XX</td><td>ADP80XX</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>AFD</td><td>Ancillary Function Driver for Winsock</td><td>Ancillary Function Driver for Winsock</td><td>Kernel </td><td>System</td><td class="status-active">Running</td></tr><tr><td>afunix</td><td>afunix</td><td>afunix</td><td>Kernel </td><td>System</td><td class="status-active">Running</td></tr><tr><td>ahcache</td><td>Application Compatibility Cache</td><td>Application Compatibility Cache</td><td>Kernel </td><td>System</td><td class="status-active">Running</td></tr><tr><td>amdacpbus</td><td>Audio Coprocessr Driver for DSP</td><td>Audio Coprocessr Driver for DSP</td><td>Kernel </td><td>Manual</td><td class="status-active">Running</td></tr><tr><td>amdgpio2</td><td>AMD GPIO Client Driver</td><td>AMD GPIO Client Driver</td><td>Kernel </td><td>Manual</td><td class="status-active">Running</td></tr><tr><td>amdi2c</td><td>AMD I2C Controller Service</td><td>AMD I2C Controller Service</td><td>Kernel </td><td>Manual</td><td class="status-active">Running</td></tr><tr><td>AmdK8</td><td>AMD K8 Processor Driver</td><td>AMD K8 Processor Driver</td><td>Kernel </td><td>Manual</td><td class="status-inactive">Stopped</td></tr><tr><td>AmdPPM</td><td>AMD Processor Driver</td><td>AMD Processor Driver</td><td>Kernel </td><td>Manual</td><td class="status-active">Running</td></tr><tr><td>amdpsp</td><td>AMD PSP Service</td><td>AMD PSP Service</td><td>Kernel </td><td>Boot</td><td class="status-active">Running</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> SECURITY INFORMATION</h2>
+        <table><thead><tr><th>Security Feature</th><th>Status</th></tr></thead><tbody><tr><td>Defender_AntivirusEnabled</td><td>True</td></tr><tr><td>Defender_AMServiceEnabled</td><td>True</td></tr><tr><td>Defender_AntispywareEnabled</td><td>True</td></tr><tr><td>Defender_RealTimeProtectionEnabled</td><td>True</td></tr><tr><td>Defender_OnAccessProtectionEnabled</td><td>True</td></tr><tr><td>FIREWALL_STATUS</td><td class="status-active">Enabled</td></tr><tr><td>UAC_STATUS</td><td class="status-active">Enabled</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> POWER MANAGEMENT</h2>
+        <table><thead><tr><th>Power Setting</th><th>Value</th></tr></thead><tbody><tr><td>ACTIVE_POWER_PLAN</td><td>381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)</td></tr><tr><td>BATTERY_PERCENTAGE</td><td>92%</td></tr><tr><td>POWER_SOURCE</td><td>Plugged In</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> ENVIRONMENT VARIABLES</h2>
+        <table><thead><tr><th>Variable</th><th>Value</th></tr></thead><tbody><tr><td>ALLUSERSPROFILE</td><td>C:\ProgramData</td></tr><tr><td>APPDATA</td><td>C:\Users\donha\AppData\Roaming</td></tr><tr><td>COMMONPROGRAMFILES</td><td>C:\Program Files\Common Files</td></tr><tr><td>COMMONPROGRAMFILES(X86)</td><td>C:\Program Files (x86)\Common Files</td></tr><tr><td>COMMONPROGRAMW6432</td><td>C:\Program Files\Common Files</td></tr><tr><td>COMPUTERNAME</td><td>DESKTOP-EU32D3F</td></tr><tr><td>COMSPEC</td><td>C:\WINDOWS\system32\cmd.exe</td></tr><tr><td>DRIVERDATA</td><td>C:\Windows\System32\Drivers\DriverData</td></tr><tr><td>EFC_8736_1592913036</td><td>1</td></tr><tr><td>HOMEDRIVE</td><td>C:</td></tr><tr><td>HOMEPATH</td><td>\Users\donha</td></tr><tr><td>LOCALAPPDATA</td><td>C:\Users\donha\AppData\Local</td></tr><tr><td>LOGONSERVER</td><td>\\DESKTOP-EU32D3F</td></tr><tr><td>NUMBER_OF_PROCESSORS</td><td>4</td></tr><tr><td>ONEDRIVE</td><td>C:\Users\donha\OneDrive</td></tr><tr><td>OS</td><td>Windows_NT</td></tr><tr><td>PATHEXT</td><td>.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC</td></tr><tr><td>PROCESSOR_ARCHITECTURE</td><td>AMD64</td></tr><tr><td>PROCESSOR_IDENTIFIER</td><td>AMD64 Family 23 Model 24 Stepping 1, AuthenticAMD</td></tr><tr><td>PROCESSOR_LEVEL</td><td>23</td></tr><tr><td>PROCESSOR_REVISION</td><td>1801</td></tr><tr><td>PROGRAMDATA</td><td>C:\ProgramData</td></tr><tr><td>PROGRAMFILES</td><td>C:\Program Files</td></tr><tr><td>PROGRAMFILES(X86)</td><td>C:\Program Files (x86)</td></tr><tr><td>PROGRAMW6432</td><td>C:\Program Files</td></tr><tr><td>PROMPT</td><td>(.venv) $P$G</td></tr><tr><td>PSMODULEPATH</td><td>C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules</td></tr><tr><td>PUBLIC</td><td>C:\Users\Public</td></tr><tr><td>PYCHARM</td><td>C:\Program Files\JetBrains\PyCharm 2025.1.2\bin;</td></tr><tr><td>PYCHARM COMMUNITY EDITION</td><td>C:\Program Files\JetBrains\PyCharm Community Edition 2025.1.2\bin;</td></tr><tr><td>PYCHARM_HOSTED</td><td>1</td></tr><tr><td>PYTHONIOENCODING</td><td>UTF-8</td></tr><tr><td>PYTHONPATH</td><td>E:\desktop\Python-Programming</td></tr><tr><td>PYTHONUNBUFFERED</td><td>1</td></tr><tr><td>SESSIONNAME</td><td>Console</td></tr><tr><td>SYSTEMDRIVE</td><td>C:</td></tr><tr><td>SYSTEMROOT</td><td>C:\WINDOWS</td></tr><tr><td>TEMP</td><td>C:\Users\donha\AppData\Local\Temp</td></tr><tr><td>TMP</td><td>C:\Users\donha\AppData\Local\Temp</td></tr><tr><td>USERDOMAIN</td><td>DESKTOP-EU32D3F</td></tr><tr><td>USERDOMAIN_ROAMINGPROFILE</td><td>DESKTOP-EU32D3F</td></tr><tr><td>USERNAME</td><td>donha</td></tr><tr><td>USERPROFILE</td><td>C:\Users\donha</td></tr><tr><td>VIRTUAL_ENV</td><td>E:\desktop\Python-Programming\.venv</td></tr><tr><td>WINDIR</td><td>C:\WINDOWS</td></tr><tr><td>_OLD_VIRTUAL_PROMPT</td><td>$P$G</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> SYSTEM UPTIME ANALYSIS</h2>
+        <table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody><tr><td>SYSTEM_BOOT_TIME</td><td>2025-11-09 20:04:15</td></tr><tr><td>CURRENT_UPTIME</td><td>2 days, 22:22:31</td></tr><tr><td>UPTIME_DAYS</td><td>2 days</td></tr><tr><td>UPTIME_HOURS</td><td>22 hours</td></tr><tr><td>SYSTEM_TIMEZONE</td><td>('India Standard Time', 'India Daylight Time')</td></tr><tr><td>CURRENT_DATETIME</td><td>2025-11-12 18:26:47</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> SYSTEM LOGS</h2>
+        <table><thead><tr><th>Log Type</th><th>Details</th></tr></thead><tbody><tr><td>SYSTEM_BOOT</td><td>Last boot: 2025-11-09 20:04:15</td></tr><tr><td>SCANNER_INFO</td><td>Scanner PID: 9728 | User: donha | Python: 3.13.5</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> EVENT LOGS SUMMARY</h2>
+        <table><thead><tr><th>Event Type</th><th>Details</th></tr></thead><tbody><tr><td>System Error</td><td>12-11-2025 17:36:28 DCOM                         10010 The description for Event ID '10010' in Sourc...</td></tr><tr><td>System Error</td><td>12-11-2025 16:59:21 Microsoft-Windows-HAL           21 The hardware real-time clock was not set beca...</td></tr><tr><td>System Error</td><td>12-11-2025 16:59:21 Microsoft-Windows-HAL           20 The hardware real-time clock was not queried ...</td></tr><tr><td>System Error</td><td>12-11-2025 16:59:21 Microsoft-Windows-HAL           21 The hardware real-time clock was not set beca...</td></tr><tr><td>System Error</td><td>12-11-2025 16:59:21 Microsoft-Windows-HAL           20 The hardware real-time clock was not queried ...</td></tr><tr><td>System Error</td><td>12-11-2025 15:59:35 Service Control Manager 3221232503 The Realtek Audio Universal Service service t...</td></tr><tr><td>System Error</td><td>12-11-2025 07:53:29 Microsoft-Windows-HAL           21 The hardware real-time clock was not set beca...</td></tr><tr><td>System Error</td><td>12-11-2025 07:53:29 Microsoft-Windows-HAL           20 The hardware real-time clock was not queried ...</td></tr><tr><td>System Error</td><td>12-11-2025 07:53:29 Microsoft-Windows-HAL           21 The hardware real-time clock was not set beca...</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> ADVANCED SYSTEM DETAILS</h2>
+        <table><thead><tr><th>Category</th><th>Detail</th></tr></thead><tbody><tr><td>ARCHITECTURE</td><td>64bit</td></tr><tr><td>PROCESSOR_BITS</td><td>64-bit</td></tr><tr><td>LAST_BOOT</td><td>2025-11-09 20:04:15</td></tr><tr><td>MEMORY_TOTAL</td><td>5.94 GB</td></tr><tr><td>MEMORY_AVAILABLE</td><td>0.70 GB</td></tr><tr><td>CPU_PHYSICAL_CORES</td><td>2</td></tr><tr><td>CPU_LOGICAL_CORES</td><td>4</td></tr><tr><td>RUNNING_PROCESSES</td><td>248</td></tr><tr><td>TOTAL_DISK_SPACE</td><td>0.97 TB</td></tr><tr><td>SYSTEM_UUID</td><td>AC22F4D3-D487-EB11-810A-14CB1965D197</td></tr><tr><td>BIOS_MANUFACTURER</td><td>Insyde</td></tr><tr><td>BIOS_VERSION</td><td>HPQOEM - 2</td></tr></tbody></table></div>
+            <div class="section">
+                <h2>> SYSTEM PERFORMANCE</h2>
+        <div class="performance-grid">
+                    <div class="performance-card">
+                        <h3>> CPU Usage</h3>
+                        <div class="performance-value">30.9%</div>
+                        <div class="performance-details">> 2 physical, 4 logical cores</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> CPU Frequency</h3>
+                        <div class="performance-value">2600 MHz</div>
+                        <div class="performance-details">> Max: 2600 MHz</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Memory Usage</h3>
+                        <div class="performance-value">88.6%</div>
+                        <div class="performance-details">> 5.3 GB / 5.9 GB</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Available Memory</h3>
+                        <div class="performance-value">0.7 GB</div>
+                        <div class="performance-details">> 11.4% available</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Swap Usage</h3>
+                        <div class="performance-value">13.4%</div>
+                        <div class="performance-details">> 1.0 GB / 7.2 GB</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Disk Read</h3>
+                        <div class="performance-value">213.51 GB</div>
+                        <div class="performance-details">> 7,031,505 operations</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Disk Write</h3>
+                        <div class="performance-value">101.33 GB</div>
+                        <div class="performance-details">> 3,613,311 operations</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Network Sent</h3>
+                        <div class="performance-value">0.01 GB</div>
+                        <div class="performance-details">> 35,718 packets</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Network Received</h3>
+                        <div class="performance-value">0.09 GB</div>
+                        <div class="performance-details">> 301,609 packets</div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <h3>> Temperature Monitoring</h3>
+                        <div class="performance-value">UNAVAILABLE</div>
+                        <div class="performance-details">> No sensor data</div>
+                    </div>
+                    </div></div>
+            <div class="section">
+                <h2>> TASK MANAGER - RUNNING PROCESSES</h2>
+        <div class="scroll-container"><table class="task-manager-table"><thead><tr><th>PID</th><th>Process Name</th><th>User</th><th>CPU %</th><th>Memory %</th><th>Memory Usage</th><th>Virtual Memory</th><th>Threads</th><th>Status</th><th>Priority</th><th>CPU Time</th><th>Uptime</th><th>Started</th><th>Executable</th></tr></thead><tbody><tr><td>0</td><td>System Idle Process</td><td>NT AUTHORITY\SYSTEM</td><td>73.10</td><td>0.000</td><td>0.01 MB</td><td>0.06 MB</td><td>12</td><td class="status-active">RUNNING</td><td>LOW</td><td>158975.84s</td><td>20404 days, 12:56:51</td><td>05:30:00</td><td>None</td></tr><tr><td>4</td><td>System</td><td>NT AUTHORITY\SYSTEM</td><td>29.60</td><td>0.014</td><td>0.85 MB</td><td>0.07 MB</td><td>311</td><td class="status-active">RUNNING</td><td>LOW</td><td>9373.91s</td><td>20404 days, 12:56:51</td><td>05:30:00</td><td></td></tr><tr><td>4240</td><td>WmiPrvSE.exe</td><td>SYSTEM</td><td>29.30</td><td>0.298</td><td>18.13 MB</td><td>18.57 MB</td><td>14</td><td class="status-active">RUNNING</td><td>LOW</td><td>2841.28s</td><td>20:12:17</td><td>22:14:35</td><td>C:\Windows\System32\wbem\WmiPrvSE.exe</td></tr><tr><td>3920</td><td>svchost.exe</td><td>SYSTEM</td><td>23.50</td><td>0.291</td><td>17.69 MB</td><td>15.55 MB</td><td>24</td><td class="status-active">RUNNING</td><td>LOW</td><td>4434.16s</td><td>3 days, 3:52:29</td><td>14:34:23</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>10680</td><td>TextInputHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>23.40</td><td>7.211</td><td>438.93 MB</td><td>464.18 MB</td><td>47</td><td class="status-active">RUNNING</td><td>LOW</td><td>573.95s</td><td>3 days, 3:51:08</td><td>14:35:46</td><td>...t.CBS_cw5n1h2txyewy\TextInputHost.exe</td></tr><tr><td>15192</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>20.90</td><td>3.093</td><td>188.29 MB</td><td>156.34 MB</td><td>17</td><td class="status-active">RUNNING</td><td>LOW</td><td>125.42s</td><td>1:13:29</td><td>17:13:25</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>3104</td><td>MemCompression</td><td>SYSTEM</td><td>15.70</td><td>12.602</td><td>767.09 MB</td><td>4.05 MB</td><td>66</td><td class="status-active">RUNNING</td><td>LOW</td><td>2067.20s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>MemCompression</td></tr><tr><td>3668</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>14.10</td><td>2.208</td><td>134.42 MB</td><td>184.50 MB</td><td>45</td><td class="status-active">RUNNING</td><td>LOW</td><td>738.42s</td><td>10:34:05</td><td>07:52:47</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>5168</td><td>MsMpEng.exe</td><td>SYSTEM</td><td>12.80</td><td>1.898</td><td>115.54 MB</td><td>312.22 MB</td><td>32</td><td class="status-active">RUNNING</td><td>LOW</td><td>5936.95s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>...latform\4.18.25090.3009-0\MsMpEng.exe</td></tr><tr><td>7964</td><td>pycharm64.exe</td><td>DESKTOP-EU32D3F\donha</td><td>10.30</td><td>19.603</td><td>1193.22 MB</td><td>1800.15 MB</td><td>70</td><td class="status-active">RUNNING</td><td>LOW</td><td>3155.42s</td><td>1:34:54</td><td>16:51:59</td><td>...ns\PyCharm 2025.1.2\bin\pycharm64.exe</td></tr><tr><td>17500</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>9.70</td><td>0.467</td><td>28.41 MB</td><td>58.38 MB</td><td>24</td><td class="status-active">RUNNING</td><td>LOW</td><td>853.64s</td><td>10:31:45</td><td>07:55:09</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>1668</td><td>dwm.exe</td><td>SYSTEM</td><td>9.60</td><td>0.653</td><td>39.73 MB</td><td>152.91 MB</td><td>20</td><td class="status-active">RUNNING</td><td>LOW</td><td>12452.19s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\dwm.exe</td></tr><tr><td>17932</td><td>Taskmgr.exe</td><td>DESKTOP-EU32D3F\donha</td><td>8.40</td><td>0.327</td><td>19.93 MB</td><td>72.55 MB</td><td>12</td><td class="status-active">RUNNING</td><td>LOW</td><td>7242.05s</td><td>2 days, 4:34:53</td><td>13:52:01</td><td>C:\Windows\System32\Taskmgr.exe</td></tr><tr><td>7952</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>8.10</td><td>1.589</td><td>96.75 MB</td><td>248.88 MB</td><td>30</td><td class="status-active">RUNNING</td><td>LOW</td><td>1202.84s</td><td>10:34:03</td><td>07:52:50</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>9728</td><td>python.exe</td><td>DESKTOP-EU32D3F\donha</td><td>7.60</td><td>0.444</td><td>27.02 MB</td><td>40.55 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>8.19s</td><td>0:01:22</td><td>18:25:32</td><td>...-Programming\.venv\Scripts\python.exe</td></tr><tr><td>15200</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>5.90</td><td>0.618</td><td>37.64 MB</td><td>70.64 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>667.52s</td><td>10:31:44</td><td>07:55:10</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>1872</td><td>svchost.exe</td><td>SYSTEM</td><td>4.20</td><td>0.077</td><td>4.68 MB</td><td>4.26 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>140.77s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2544</td><td>svchost.exe</td><td>SYSTEM</td><td>4.00</td><td>0.089</td><td>5.43 MB</td><td>5.10 MB</td><td>12</td><td class="status-active">RUNNING</td><td>LOW</td><td>646.22s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1240</td><td>services.exe</td><td>SYSTEM</td><td>2.60</td><td>0.082</td><td>5.00 MB</td><td>6.82 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>211.94s</td><td>3 days, 3:52:34</td><td>14:34:17</td><td>C:\Windows\System32\services.exe</td></tr><tr><td>3356</td><td>svchost.exe</td><td>SYSTEM</td><td>2.60</td><td>0.098</td><td>5.94 MB</td><td>9.25 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>124.34s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>15864</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>2.30</td><td>0.380</td><td>23.13 MB</td><td>19.41 MB</td><td>19</td><td class="status-active">RUNNING</td><td>LOW</td><td>147.61s</td><td>10:34:04</td><td>07:52:50</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>9172</td><td>conhost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>2.20</td><td>0.034</td><td>2.09 MB</td><td>1.14 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.28s</td><td>0:01:20</td><td>18:25:33</td><td>C:\Windows\System32\conhost.exe</td></tr><tr><td>20740</td><td>MSPCManagerCore.exe</td><td>DESKTOP-EU32D3F\donha</td><td>1.90</td><td>0.252</td><td>15.34 MB</td><td>66.38 MB</td><td>29</td><td class="status-active">RUNNING</td><td>LOW</td><td>105.53s</td><td>1:23:33</td><td>17:03:22</td><td>...3d8bbwe\PCManager\MSPCManagerCore.exe</td></tr><tr><td>1524</td><td>svchost.exe</td><td>SYSTEM</td><td>1.60</td><td>0.174</td><td>10.59 MB</td><td>10.61 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>669.11s</td><td>3 days, 3:52:34</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4532</td><td>svchost.exe</td><td>SYSTEM</td><td>1.40</td><td>0.216</td><td>13.13 MB</td><td>8.71 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>185.36s</td><td>3 days, 3:52:27</td><td>14:34:25</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>9588</td><td>SearchIndexer.exe</td><td>SYSTEM</td><td>1.30</td><td>0.202</td><td>12.29 MB</td><td>81.02 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>3562.50s</td><td>3 days, 3:51:16</td><td>14:35:37</td><td>C:\Windows\System32\SearchIndexer.exe</td></tr><tr><td>12568</td><td>WmiPrvSE.exe</td><td>SYSTEM</td><td>1.30</td><td>0.196</td><td>11.93 MB</td><td>5.33 MB</td><td>11</td><td class="status-active">RUNNING</td><td>LOW</td><td>27.39s</td><td>0:40:01</td><td>17:46:53</td><td>C:\Windows\System32\wbem\WmiPrvSE.exe</td></tr><tr><td>18884</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>1.20</td><td>0.659</td><td>40.09 MB</td><td>53.46 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>63.89s</td><td>10:34:00</td><td>07:52:55</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>2832</td><td>GoogleDriveFS.exe</td><td>DESKTOP-EU32D3F\donha</td><td>1.10</td><td>0.368</td><td>22.39 MB</td><td>190.36 MB</td><td>100</td><td class="status-active">RUNNING</td><td>LOW</td><td>467.45s</td><td>10:31:47</td><td>07:55:05</td><td>...le Stream\116.0.6.0\GoogleDriveFS.exe</td></tr><tr><td>5052</td><td>RtkBtManServ.exe</td><td>SYSTEM</td><td>1.10</td><td>0.016</td><td>0.97 MB</td><td>2.46 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>33.28s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\RtkBtManServ.exe</td></tr><tr><td>11748</td><td>PhoneExperienceHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>1.10</td><td>0.183</td><td>11.12 MB</td><td>60.70 MB</td><td>26</td><td class="status-active">RUNNING</td><td>LOW</td><td>1055.20s</td><td>3 days, 3:50:59</td><td>14:35:55</td><td>...8wekyb3d8bbwe\PhoneExperienceHost.exe</td></tr><tr><td>1068</td><td>csrss.exe</td><td>SYSTEM</td><td>1.00</td><td>0.015</td><td>0.94 MB</td><td>9.95 MB</td><td>15</td><td class="status-active">RUNNING</td><td>LOW</td><td>778.36s</td><td>3 days, 3:52:35</td><td>14:34:17</td><td>C:\Windows\System32\csrss.exe</td></tr><tr><td>1276</td><td>lsass.exe</td><td>SYSTEM</td><td>0.90</td><td>0.157</td><td>9.55 MB</td><td>12.42 MB</td><td>12</td><td class="status-active">RUNNING</td><td>LOW</td><td>386.08s</td><td>3 days, 3:52:34</td><td>14:34:17</td><td>C:\Windows\System32\lsass.exe</td></tr><tr><td>5072</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.90</td><td>0.298</td><td>18.14 MB</td><td>22.01 MB</td><td>21</td><td class="status-active">RUNNING</td><td>LOW</td><td>81.19s</td><td>3 days, 3:51:18</td><td>14:35:34</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>7608</td><td>svchost.exe</td><td>SYSTEM</td><td>0.90</td><td>0.049</td><td>3.00 MB</td><td>1.68 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>30.83s</td><td>0:40:00</td><td>17:46:53</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1548</td><td>svchost.exe</td><td>SYSTEM</td><td>0.80</td><td>0.040</td><td>2.41 MB</td><td>8.08 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>135.59s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>6892</td><td>MSPCManagerService.exe</td><td>SYSTEM</td><td>0.80</td><td>0.163</td><td>9.95 MB</td><td>56.84 MB</td><td>22</td><td class="status-active">RUNNING</td><td>LOW</td><td>496.44s</td><td>3 days, 3:52:19</td><td>14:34:33</td><td>...bbwe\PCManager\MSPCManagerService.exe</td></tr><tr><td>8736</td><td>explorer.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.80</td><td>1.330</td><td>80.94 MB</td><td>246.92 MB</td><td>131</td><td class="status-active">RUNNING</td><td>LOW</td><td>3255.88s</td><td>3 days, 3:51:26</td><td>14:35:27</td><td>C:\Windows\explorer.exe</td></tr><tr><td>13560</td><td>MSPCManager.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.80</td><td>0.254</td><td>15.43 MB</td><td>124.22 MB</td><td>39</td><td class="status-active">RUNNING</td><td>LOW</td><td>229.86s</td><td>20:01:10</td><td>22:25:44</td><td>...ekyb3d8bbwe\PCManager\MSPCManager.exe</td></tr><tr><td>1860</td><td>svchost.exe</td><td>SYSTEM</td><td>0.70</td><td>0.016</td><td>0.98 MB</td><td>3.95 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>29.19s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>11880</td><td>ctfmon.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.70</td><td>0.135</td><td>8.23 MB</td><td>28.53 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>429.67s</td><td>3 days, 3:50:56</td><td>14:35:58</td><td>C:\Windows\System32\ctfmon.exe</td></tr><tr><td>6680</td><td>svchost.exe</td><td>SYSTEM</td><td>0.60</td><td>0.136</td><td>8.30 MB</td><td>7.11 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>266.78s</td><td>3 days, 3:52:20</td><td>14:34:33</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>9072</td><td>svchost.exe</td><td>SYSTEM</td><td>0.60</td><td>0.281</td><td>17.11 MB</td><td>24.58 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>133.20s</td><td>3 days, 3:50:14</td><td>14:36:40</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4176</td><td>svchost.exe</td><td>SYSTEM</td><td>0.50</td><td>0.034</td><td>2.09 MB</td><td>2.73 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>134.06s</td><td>3 days, 3:52:28</td><td>14:34:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4352</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.50</td><td>0.763</td><td>46.43 MB</td><td>179.50 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>45.91s</td><td>0:19:46</td><td>18:07:07</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>4420</td><td>svchost.exe</td><td>SYSTEM</td><td>0.50</td><td>0.038</td><td>2.31 MB</td><td>3.11 MB</td><td>11</td><td class="status-active">RUNNING</td><td>LOW</td><td>68.53s</td><td>3 days, 3:52:28</td><td>14:34:25</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2820</td><td>svchost.exe</td><td>SYSTEM</td><td>0.40</td><td>0.032</td><td>1.93 MB</td><td>3.26 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>26.55s</td><td>3 days, 3:52:32</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1928</td><td>svchost.exe</td><td>SYSTEM</td><td>0.30</td><td>0.025</td><td>1.53 MB</td><td>3.20 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>16.62s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3068</td><td>atieclxx.exe</td><td>SYSTEM</td><td>0.30</td><td>0.005</td><td>0.31 MB</td><td>4.36 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>215.38s</td><td>3 days, 3:52:32</td><td>14:34:20</td><td>...10263edfe9a1aa63\B374868\atieclxx.exe</td></tr><tr><td>3816</td><td>svchost.exe</td><td>SYSTEM</td><td>0.30</td><td>0.180</td><td>10.97 MB</td><td>25.75 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>463.66s</td><td>3 days, 3:52:29</td><td>14:34:23</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1856</td><td>svchost.exe</td><td>SYSTEM</td><td>0.20</td><td>0.028</td><td>1.68 MB</td><td>2.50 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>11.09s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2248</td><td>svchost.exe</td><td>SYSTEM</td><td>0.20</td><td>0.090</td><td>5.45 MB</td><td>3.82 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>77.33s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3216</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.20</td><td>0.035</td><td>2.13 MB</td><td>17.11 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>54.72s</td><td>3 days, 3:51:28</td><td>14:35:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3420</td><td>svchost.exe</td><td>SYSTEM</td><td>0.20</td><td>0.029</td><td>1.75 MB</td><td>2.85 MB</td><td>11</td><td class="status-active">RUNNING</td><td>LOW</td><td>11.58s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4832</td><td>svchost.exe</td><td>SYSTEM</td><td>0.20</td><td>0.169</td><td>10.27 MB</td><td>30.57 MB</td><td>12</td><td class="status-active">RUNNING</td><td>LOW</td><td>215.03s</td><td>3 days, 3:52:25</td><td>14:34:27</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4984</td><td>MpDefenderCoreService.exe</td><td>SYSTEM</td><td>0.20</td><td>0.042</td><td>2.55 MB</td><td>11.11 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>22.55s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>...5090.3009-0\MpDefenderCoreService.exe</td></tr><tr><td>6856</td><td>gamingservices.exe</td><td>SYSTEM</td><td>0.20</td><td>0.102</td><td>6.23 MB</td><td>18.40 MB</td><td>52</td><td class="status-active">RUNNING</td><td>LOW</td><td>118.64s</td><td>3 days, 3:52:19</td><td>14:34:33</td><td>...x64__8wekyb3d8bbwe\gamingservices.exe</td></tr><tr><td>8576</td><td>svchost.exe</td><td>SYSTEM</td><td>0.20</td><td>0.055</td><td>3.35 MB</td><td>5.97 MB</td><td>11</td><td class="status-active">RUNNING</td><td>LOW</td><td>27.52s</td><td>3 days, 3:51:27</td><td>14:35:26</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>13184</td><td>svchost.exe</td><td>SYSTEM</td><td>0.20</td><td>0.058</td><td>3.51 MB</td><td>11.40 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>51.27s</td><td>3 days, 3:49:57</td><td>14:36:57</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>14040</td><td>fsnotifier.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.20</td><td>0.004</td><td>0.25 MB</td><td>0.60 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>6.45s</td><td>1:34:15</td><td>16:52:39</td><td>...s\PyCharm 2025.1.2\bin\fsnotifier.exe</td></tr><tr><td>17416</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.20</td><td>0.227</td><td>13.82 MB</td><td>43.64 MB</td><td>48</td><td class="status-active">RUNNING</td><td>LOW</td><td>15.91s</td><td>10:31:46</td><td>07:55:08</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>1004</td><td>csrss.exe</td><td>SYSTEM</td><td>0.10</td><td>0.010</td><td>0.64 MB</td><td>2.20 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>23.52s</td><td>3 days, 3:52:36</td><td>14:34:16</td><td>C:\Windows\System32\csrss.exe</td></tr><tr><td>1112</td><td>sihost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.200</td><td>12.20 MB</td><td>11.16 MB</td><td>15</td><td class="status-active">RUNNING</td><td>LOW</td><td>175.70s</td><td>3 days, 3:51:27</td><td>14:35:24</td><td>C:\Windows\System32\sihost.exe</td></tr><tr><td>1404</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.121</td><td>7.37 MB</td><td>16.45 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>323.42s</td><td>3 days, 3:52:34</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2152</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.124</td><td>7.54 MB</td><td>8.67 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>253.80s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2264</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.037</td><td>2.23 MB</td><td>3.26 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>322.27s</td><td>3 days, 3:52:31</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2504</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.016</td><td>0.97 MB</td><td>1.39 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>9.36s</td><td>3 days, 3:52:31</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2716</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.112</td><td>6.84 MB</td><td>23.67 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>137.95s</td><td>3 days, 3:50:10</td><td>14:36:41</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2768</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.089</td><td>5.43 MB</td><td>15.14 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>33.72s</td><td>3 days, 3:52:32</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2948</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.087</td><td>5.27 MB</td><td>41.57 MB</td><td>49</td><td class="status-active">RUNNING</td><td>LOW</td><td>20.11s</td><td>20:00:55</td><td>22:25:57</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>4864</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.112</td><td>6.83 MB</td><td>38.14 MB</td><td>17</td><td class="status-active">RUNNING</td><td>LOW</td><td>471.91s</td><td>3 days, 3:52:25</td><td>14:34:27</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5164</td><td>svchost.exe</td><td>SYSTEM</td><td>0.10</td><td>0.039</td><td>2.39 MB</td><td>10.34 MB</td><td>12</td><td class="status-active">RUNNING</td><td>LOW</td><td>27.62s</td><td>3 days, 3:51:19</td><td>14:35:34</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>9384</td><td>StartMenuExperienceHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.175</td><td>10.68 MB</td><td>115.16 MB</td><td>20</td><td class="status-active">RUNNING</td><td>LOW</td><td>163.12s</td><td>3 days, 3:51:17</td><td>14:35:36</td><td>...1h2txyewy\StartMenuExperienceHost.exe</td></tr><tr><td>9580</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.783</td><td>47.66 MB</td><td>171.00 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>51.62s</td><td>0:17:18</td><td>18:09:35</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>12112</td><td>remoting_host.exe</td><td>SYSTEM</td><td>0.10</td><td>0.078</td><td>4.72 MB</td><td>8.73 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.42s</td><td>10:10:02</td><td>08:16:52</td><td>...esktop\143.0.7499.7\remoting_host.exe</td></tr><tr><td>12852</td><td>conhost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.007</td><td>0.40 MB</td><td>6.04 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.53s</td><td>10:31:49</td><td>07:55:05</td><td>C:\Windows\System32\conhost.exe</td></tr><tr><td>13012</td><td>msedge.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.211</td><td>12.83 MB</td><td>62.59 MB</td><td>49</td><td class="status-active">RUNNING</td><td>LOW</td><td>15.36s</td><td>1:24:58</td><td>17:01:56</td><td>...Microsoft\Edge\Application\msedge.exe</td></tr><tr><td>13880</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.259</td><td>15.77 MB</td><td>313.77 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>542.16s</td><td>0:35:35</td><td>17:51:19</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>15044</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.166</td><td>10.07 MB</td><td>36.58 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.38s</td><td>0:08:47</td><td>18:18:07</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>17640</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.312</td><td>19.00 MB</td><td>140.93 MB</td><td>15</td><td class="status-active">RUNNING</td><td>LOW</td><td>27.34s</td><td>0:18:32</td><td>18:08:22</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>18428</td><td>OneDrive.Sync.Service.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.10</td><td>0.049</td><td>3.00 MB</td><td>37.85 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.23s</td><td>1:23:13</td><td>17:03:42</td><td>...9.1012.0002\OneDrive.Sync.Service.exe</td></tr><tr><td>92</td><td></td><td>SYSTEM</td><td>0.00</td><td>0.635</td><td>38.67 MB</td><td>0.18 MB</td><td>0</td><td class="status-inactive">STOPPED</td><td>LOW</td><td>0.00s</td><td>3 days, 3:52:46</td><td>14:34:05</td><td></td></tr><tr><td>136</td><td>Registry</td><td>SYSTEM</td><td>0.00</td><td>0.147</td><td>8.96 MB</td><td>14.41 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>11.88s</td><td>3 days, 3:52:46</td><td>14:34:05</td><td>Registry</td></tr><tr><td>232</td><td>crashpad_handler.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.001</td><td>0.04 MB</td><td>1.50 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.50s</td><td>3 days, 3:49:14</td><td>14:37:37</td><td>...Stream\116.0.6.0\crashpad_handler.exe</td></tr><tr><td>544</td><td>smss.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.00 MB</td><td>1.12 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.42s</td><td>3 days, 3:52:44</td><td>14:34:07</td><td>C:\Windows\System32\smss.exe</td></tr><tr><td>1060</td><td>wininit.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.43 MB</td><td>1.54 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.08s</td><td>3 days, 3:52:35</td><td>14:34:17</td><td>C:\Windows\System32\wininit.exe</td></tr><tr><td>1088</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.046</td><td>2.82 MB</td><td>10.50 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>26.86s</td><td>3 days, 3:51:27</td><td>14:35:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1148</td><td>winlogon.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.42 MB</td><td>2.62 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.31s</td><td>3 days, 3:52:34</td><td>14:34:17</td><td>C:\Windows\System32\winlogon.exe</td></tr><tr><td>1260</td><td>LsaIso.exe</td><td>SYSTEM</td><td>0.00</td><td>0.005</td><td>0.33 MB</td><td>3.61 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.33s</td><td>3 days, 3:52:34</td><td>14:34:17</td><td>C:\Windows\System32\LsaIso.exe</td></tr><tr><td>1288</td><td>RuntimeBroker.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.050</td><td>3.02 MB</td><td>9.07 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.31s</td><td>2 days, 0:21:51</td><td>18:05:00</td><td>C:\Windows\System32\RuntimeBroker.exe</td></tr><tr><td>1304</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.015</td><td>0.93 MB</td><td>2.48 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.64s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1416</td><td>fontdrvhost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>1.81 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.11s</td><td>3 days, 3:52:34</td><td>14:34:18</td><td>C:\Windows\System32\fontdrvhost.exe</td></tr><tr><td>1424</td><td>fontdrvhost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>6.02 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.17s</td><td>3 days, 3:52:34</td><td>14:34:18</td><td>C:\Windows\System32\fontdrvhost.exe</td></tr><tr><td>1436</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.016</td><td>1.00 MB</td><td>6.16 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>42.80s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1560</td><td>ETDCtrl.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.003</td><td>0.21 MB</td><td>7.38 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.22s</td><td>3 days, 3:51:28</td><td>14:35:23</td><td>C:\Windows\System32\ETDCtrl.exe</td></tr><tr><td>1584</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.028</td><td>1.72 MB</td><td>2.72 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>32.64s</td><td>3 days, 3:52:34</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1656</td><td>dllhost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.005</td><td>0.28 MB</td><td>1.51 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.28s</td><td>2 days, 21:24:13</td><td>21:02:38</td><td>C:\Windows\System32\dllhost.exe</td></tr><tr><td>1760</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.010</td><td>0.61 MB</td><td>1.26 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.05s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1936</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.028</td><td>1.68 MB</td><td>2.27 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.34s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>1944</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.018</td><td>1.09 MB</td><td>2.29 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.41s</td><td>3 days, 3:52:33</td><td>14:34:18</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2076</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.019</td><td>1.16 MB</td><td>3.07 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.83s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2112</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.017</td><td>1.03 MB</td><td>2.03 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.23s</td><td>3 days, 3:52:31</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2116</td><td>SAService.exe</td><td>SYSTEM</td><td>0.00</td><td>0.014</td><td>0.88 MB</td><td>7.48 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.97s</td><td>2 days, 20:00:03</td><td>22:26:49</td><td>...3c1yjt4zspk6g\SAService\SAService.exe</td></tr><tr><td>2188</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.023</td><td>1.37 MB</td><td>2.64 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.48s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2212</td><td>msedge.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.055</td><td>3.36 MB</td><td>12.09 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.19s</td><td>1:24:52</td><td>17:01:59</td><td>...Microsoft\Edge\Application\msedge.exe</td></tr><tr><td>2288</td><td>BraveCrashHandler.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.01 MB</td><td>1.76 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.91s</td><td>3 days, 3:50:22</td><td>14:36:29</td><td>...ate\1.3.361.151\BraveCrashHandler.exe</td></tr><tr><td>2340</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.024</td><td>1.48 MB</td><td>1.55 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.28s</td><td>3 days, 3:52:33</td><td>14:34:19</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2748</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.021</td><td>1.25 MB</td><td>2.08 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.31s</td><td>3 days, 3:52:32</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>2776</td><td>atiesrxx.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>1.67 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.55s</td><td>3 days, 3:52:32</td><td>14:34:20</td><td>...10263edfe9a1aa63\B374868\atiesrxx.exe</td></tr><tr><td>2928</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.003</td><td>0.16 MB</td><td>3.65 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.70s</td><td>10:33:53</td><td>07:52:59</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3004</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.036</td><td>2.22 MB</td><td>2.01 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.64s</td><td>3 days, 3:52:32</td><td>14:34:20</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3036</td><td>cncmd.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.006</td><td>0.39 MB</td><td>1.71 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.20s</td><td>3 days, 3:50:36</td><td>14:36:16</td><td>...a9344xs7nr4m\radeonsoftware\cncmd.exe</td></tr><tr><td>3120</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.009</td><td>0.53 MB</td><td>2.03 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.30s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3148</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.022</td><td>1.32 MB</td><td>3.51 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>19.61s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3164</td><td>AppHelperCap.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>5.41 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>31.89s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>...383a15da209a6794\x64\AppHelperCap.exe</td></tr><tr><td>3172</td><td>DiagsCap.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>22.40 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>12.19s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>...d64_383a15da209a6794\x64\DiagsCap.exe</td></tr><tr><td>3184</td><td>NetworkCap.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>3.94 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.66s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>...4_383a15da209a6794\x64\NetworkCap.exe</td></tr><tr><td>3192</td><td>SysInfoCap.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>204.53 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>21.39s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>...4_383a15da209a6794\x64\SysInfoCap.exe</td></tr><tr><td>3200</td><td>TouchpointAnalyticsClientServi</td><td>SYSTEM</td><td>0.00</td><td>0.176</td><td>10.70 MB</td><td>60.13 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>37.08s</td><td>3 days, 3:52:31</td><td>14:34:21</td><td>...\TouchpointAnalyticsClientService.exe</td></tr><tr><td>3212</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.008</td><td>0.47 MB</td><td>2.17 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.02s</td><td>3 days, 3:51:28</td><td>14:35:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3276</td><td>RuntimeBroker.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.012</td><td>0.73 MB</td><td>2.31 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.34s</td><td>3 days, 3:50:35</td><td>14:36:17</td><td>C:\Windows\System32\RuntimeBroker.exe</td></tr><tr><td>3304</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.017</td><td>1.01 MB</td><td>1.65 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.88s</td><td>3 days, 3:52:28</td><td>14:34:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3392</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.007</td><td>0.42 MB</td><td>2.07 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.09s</td><td>3 days, 3:51:28</td><td>14:35:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3600</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.050</td><td>3.03 MB</td><td>4.68 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>55.70s</td><td>3 days, 3:52:30</td><td>14:34:22</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3632</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.009</td><td>0.53 MB</td><td>3.16 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>51.36s</td><td>3 days, 3:52:30</td><td>14:34:22</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3720</td><td>NgcIso.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.00 MB</td><td>1.35 MB</td><td>1</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.42s</td><td>3 days, 3:52:30</td><td>14:34:22</td><td>C:\Windows\System32\NgcIso.exe</td></tr><tr><td>3772</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.008</td><td>0.51 MB</td><td>1.39 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.59s</td><td>3 days, 3:52:24</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>3856</td><td>dllhost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.018</td><td>1.12 MB</td><td>2.67 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.28s</td><td>2 days, 4:34:53</td><td>13:51:59</td><td>C:\Windows\System32\dllhost.exe</td></tr><tr><td>4108</td><td>unsecapp.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.41 MB</td><td>1.90 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.67s</td><td>3 days, 3:52:28</td><td>14:34:24</td><td>C:\Windows\System32\wbem\unsecapp.exe</td></tr><tr><td>4140</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.012</td><td>0.73 MB</td><td>2.39 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.88s</td><td>3 days, 3:52:24</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4168</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.045</td><td>2.74 MB</td><td>2.55 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>21.36s</td><td>3 days, 3:52:28</td><td>14:34:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4184</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.015</td><td>0.89 MB</td><td>2.19 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.67s</td><td>3 days, 2:57:58</td><td>15:28:54</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4196</td><td>TrustedInstaller.exe</td><td>SYSTEM</td><td>0.00</td><td>0.051</td><td>3.12 MB</td><td>1.84 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.16s</td><td>0:00:53</td><td>18:25:59</td><td>...indows\servicing\TrustedInstaller.exe</td></tr><tr><td>4232</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.029</td><td>1.77 MB</td><td>5.19 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>44.16s</td><td>3 days, 3:52:12</td><td>14:34:40</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4280</td><td>WmiPrvSE.exe</td><td>SYSTEM</td><td>0.00</td><td>0.019</td><td>1.18 MB</td><td>7.70 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>7.30s</td><td>3 days, 3:52:28</td><td>14:34:24</td><td>C:\Windows\System32\wbem\WmiPrvSE.exe</td></tr><tr><td>4372</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.093</td><td>5.63 MB</td><td>3.28 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>58.11s</td><td>3 days, 3:52:28</td><td>14:34:25</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4412</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.018</td><td>1.12 MB</td><td>1.72 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.98s</td><td>3 days, 3:52:12</td><td>14:34:40</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4472</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.011</td><td>0.68 MB</td><td>3.05 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.92s</td><td>3 days, 3:50:11</td><td>14:36:42</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4560</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.028</td><td>1.68 MB</td><td>3.10 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>7.14s</td><td>3 days, 3:52:27</td><td>14:34:25</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4584</td><td>HelpPane.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>4.89 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.69s</td><td>3 days, 3:40:26</td><td>14:46:27</td><td>C:\Windows\HelpPane.exe</td></tr><tr><td>4604</td><td>spoolsv.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>9.08 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.58s</td><td>3 days, 3:52:27</td><td>14:34:26</td><td>C:\Windows\System32\spoolsv.exe</td></tr><tr><td>4640</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.049</td><td>2.99 MB</td><td>15.58 MB</td><td>15</td><td class="status-active">RUNNING</td><td>LOW</td><td>103.36s</td><td>3 days, 3:52:27</td><td>14:34:26</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4668</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.033</td><td>2.02 MB</td><td>1.91 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.11s</td><td>3 days, 3:52:27</td><td>14:34:26</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>4844</td><td>AnyDesk.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.44 MB</td><td>21.24 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>19.97s</td><td>3 days, 3:52:25</td><td>14:34:27</td><td>...ogram Files (x86)\AnyDesk\AnyDesk.exe</td></tr><tr><td>4880</td><td>ETDService.exe</td><td>SYSTEM</td><td>0.00</td><td>0.004</td><td>0.23 MB</td><td>1.55 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>7.61s</td><td>3 days, 3:52:25</td><td>14:34:27</td><td>C:\Windows\System32\ETDService.exe</td></tr><tr><td>4892</td><td>OfficeClickToRun.exe</td><td>SYSTEM</td><td>0.00</td><td>0.072</td><td>4.37 MB</td><td>36.67 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>37.55s</td><td>3 days, 3:52:25</td><td>14:34:27</td><td>...hared\ClickToRun\OfficeClickToRun.exe</td></tr><tr><td>4940</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.006</td><td>0.34 MB</td><td>2.94 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>9.23s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5064</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.016</td><td>0.95 MB</td><td>1.78 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.59s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5092</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.018</td><td>1.09 MB</td><td>2.14 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>2.67s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5100</td><td>SECOMN64.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>2.84 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.91s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\SECOMN64.exe</td></tr><tr><td>5144</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.039</td><td>2.36 MB</td><td>5.58 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>20.38s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5188</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.017</td><td>1.06 MB</td><td>1.82 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.06s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5356</td><td>BraveCrashHandler64.exe</td><td>SYSTEM</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>1.73 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.22s</td><td>3 days, 3:50:22</td><td>14:36:30</td><td>...e\1.3.361.151\BraveCrashHandler64.exe</td></tr><tr><td>5396</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.005</td><td>0.29 MB</td><td>2.96 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>8.27s</td><td>3 days, 3:50:12</td><td>14:36:41</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5452</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.031</td><td>1.90 MB</td><td>4.00 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>11.47s</td><td>3 days, 3:45:57</td><td>14:40:56</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5460</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.017</td><td>1.02 MB</td><td>2.18 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.27s</td><td>3 days, 3:52:25</td><td>14:34:28</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>5904</td><td>backgroundTaskHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.080</td><td>4.89 MB</td><td>22.34 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>22.45s</td><td>2 days, 0:21:54</td><td>18:04:59</td><td>...ndows\System32\backgroundTaskHost.exe</td></tr><tr><td>5916</td><td>brave.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.074</td><td>4.50 MB</td><td>10.20 MB</td><td>11</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.55s</td><td>10:34:03</td><td>07:52:50</td><td>...e\Brave-Browser\Application\brave.exe</td></tr><tr><td>5972</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.025</td><td>1.52 MB</td><td>3.90 MB</td><td>14</td><td class="status-active">RUNNING</td><td>LOW</td><td>7.66s</td><td>3 days, 3:52:24</td><td>14:34:29</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>6344</td><td>ShellExperienceHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.000</td><td>0.01 MB</td><td>45.41 MB</td><td>21</td><td class="status-inactive">STOPPED</td><td>LOW</td><td>39.56s</td><td>3 days, 3:45:50</td><td>14:41:03</td><td>...cw5n1h2txyewy\ShellExperienceHost.exe</td></tr><tr><td>6632</td><td>MoUsoCoreWorker.exe</td><td>SYSTEM</td><td>0.00</td><td>0.054</td><td>3.31 MB</td><td>42.82 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>24.58s</td><td>0:51:06</td><td>17:35:47</td><td>C:\Windows\UUS\amd64\MoUsoCoreWorker.exe</td></tr><tr><td>6864</td><td>gamingservicesnet.exe</td><td>SYSTEM</td><td>0.00</td><td>0.004</td><td>0.24 MB</td><td>11.76 MB</td><td>38</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.08s</td><td>3 days, 3:52:19</td><td>14:34:33</td><td>...__8wekyb3d8bbwe\gamingservicesnet.exe</td></tr><tr><td>6880</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.007</td><td>0.44 MB</td><td>11.98 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.64s</td><td>20:00:56</td><td>22:25:57</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>7036</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.015</td><td>0.92 MB</td><td>6.26 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>18.03s</td><td>3 days, 3:50:11</td><td>14:36:42</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>7228</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.077</td><td>4.67 MB</td><td>13.48 MB</td><td>13</td><td class="status-active">RUNNING</td><td>LOW</td><td>85.69s</td><td>3 days, 3:52:13</td><td>14:34:40</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>7332</td><td>AggregatorHost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.054</td><td>3.27 MB</td><td>3.87 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>8.44s</td><td>3 days, 3:52:17</td><td>14:34:36</td><td>C:\Windows\System32\AggregatorHost.exe</td></tr><tr><td>7404</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.065</td><td>3.97 MB</td><td>15.02 MB</td><td>17</td><td class="status-active">RUNNING</td><td>LOW</td><td>26.44s</td><td>3 days, 3:50:29</td><td>14:36:24</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>7664</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.012</td><td>0.74 MB</td><td>1.03 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.05s</td><td>3 days, 3:52:16</td><td>14:34:37</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>8072</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.025</td><td>1.51 MB</td><td>2.76 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>10.45s</td><td>3 days, 3:52:13</td><td>14:34:40</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>8148</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.45 MB</td><td>2.72 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>17.56s</td><td>3 days, 3:51:30</td><td>14:35:23</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>8228</td><td>taskhostw.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.049</td><td>2.96 MB</td><td>10.27 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>25.70s</td><td>3 days, 3:51:29</td><td>14:35:24</td><td>C:\Windows\System32\taskhostw.exe</td></tr><tr><td>8272</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.040</td><td>2.42 MB</td><td>5.95 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>205.00s</td><td>3 days, 3:51:29</td><td>14:35:24</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>8344</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.012</td><td>0.71 MB</td><td>6.38 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.16s</td><td>1 day, 20:54:04</td><td>21:32:49</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>8396</td><td>taskhostw.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.005</td><td>0.29 MB</td><td>13.71 MB</td><td>6</td><td class="status-active">RUNNING</td><td>LOW</td><td>28.98s</td><td>3 days, 3:12:21</td><td>15:14:32</td><td>C:\Windows\System32\taskhostw.exe</td></tr><tr><td>8432</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.008</td><td>0.46 MB</td><td>2.77 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.45s</td><td>3 days, 2:58:06</td><td>15:28:47</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>9064</td><td>RtkAudUService64.exe</td><td>SYSTEM</td><td>0.00</td><td>0.003</td><td>0.18 MB</td><td>5.75 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>12.03s</td><td>3 days, 3:51:24</td><td>14:35:29</td><td>...e80fb7173daab733\RtkAudUService64.exe</td></tr><tr><td>9116</td><td>CrossDeviceResume.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.010</td><td>0.61 MB</td><td>15.23 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.59s</td><td>3 days, 3:51:23</td><td>14:35:30</td><td>...S_cw5n1h2txyewy\CrossDeviceResume.exe</td></tr><tr><td>9488</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.030</td><td>1.80 MB</td><td>11.16 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>32.34s</td><td>3 days, 3:14:54</td><td>15:11:59</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>9504</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.029</td><td>1.75 MB</td><td>9.73 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>4.39s</td><td>3 days, 3:50:29</td><td>14:36:24</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>9544</td><td>RuntimeBroker.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.112</td><td>6.83 MB</td><td>15.35 MB</td><td>16</td><td class="status-active">RUNNING</td><td>LOW</td><td>42.66s</td><td>3 days, 3:51:16</td><td>14:35:37</td><td>C:\Windows\System32\RuntimeBroker.exe</td></tr><tr><td>9596</td><td>svchost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.003</td><td>0.18 MB</td><td>3.89 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.25s</td><td>3 days, 3:51:16</td><td>14:35:37</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>9656</td><td>WidgetBoard.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.005</td><td>0.29 MB</td><td>5.71 MB</td><td>3</td><td class="status-active">RUNNING</td><td>LOW</td><td>14.45s</td><td>3 days, 3:51:16</td><td>14:35:38</td><td>....0_x64__cw5n1h2txyewy\WidgetBoard.exe</td></tr><tr><td>9724</td><td>MicrosoftStartFeedProvider.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.032</td><td>1.96 MB</td><td>11.23 MB</td><td>9</td><td class="status-active">RUNNING</td><td>LOW</td><td>48.62s</td><td>3 days, 3:50:48</td><td>14:36:05</td><td>...ovider\MicrosoftStartFeedProvider.exe</td></tr><tr><td>9832</td><td>ShellHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.053</td><td>3.21 MB</td><td>13.28 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.42s</td><td>0:04:50</td><td>18:22:04</td><td>C:\Windows\System32\ShellHost.exe</td></tr><tr><td>9836</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.078</td><td>4.76 MB</td><td>51.10 MB</td><td>24</td><td class="status-active">RUNNING</td><td>LOW</td><td>13.58s</td><td>3 days, 3:50:29</td><td>14:36:24</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>9880</td><td>UserOOBEBroker.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>2.08 MB</td><td>1</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.25s</td><td>3 days, 3:51:14</td><td>14:35:39</td><td>...dows\System32\oobe\UserOOBEBroker.exe</td></tr><tr><td>9988</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.017</td><td>1.05 MB</td><td>2.24 MB</td><td>10</td><td class="status-active">RUNNING</td><td>LOW</td><td>9.11s</td><td>3 days, 3:50:22</td><td>14:36:31</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>10184</td><td>WidgetService.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.007</td><td>0.41 MB</td><td>5.92 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>26.58s</td><td>3 days, 3:51:12</td><td>14:35:42</td><td>...8bbwe\WidgetService\WidgetService.exe</td></tr><tr><td>10228</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.100</td><td>6.06 MB</td><td>37.54 MB</td><td>21</td><td class="status-active">RUNNING</td><td>LOW</td><td>354.80s</td><td>0:51:00</td><td>17:35:53</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>10320</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.070</td><td>4.26 MB</td><td>12.74 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>3.39s</td><td>10:31:44</td><td>07:55:09</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>10412</td><td>msedge.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>2.11 MB</td><td>7</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.19s</td><td>1:24:56</td><td>17:01:58</td><td>...Microsoft\Edge\Application\msedge.exe</td></tr><tr><td>10476</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.244</td><td>14.84 MB</td><td>40.66 MB</td><td>46</td><td class="status-active">RUNNING</td><td>LOW</td><td>76.61s</td><td>3 days, 3:50:30</td><td>14:36:23</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>10840</td><td>RuntimeBroker.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.019</td><td>1.18 MB</td><td>3.35 MB</td><td>4</td><td class="status-active">RUNNING</td><td>LOW</td><td>5.67s</td><td>3 days, 3:45:50</td><td>14:41:04</td><td>C:\Windows\System32\RuntimeBroker.exe</td></tr><tr><td>11060</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.067</td><td>4.09 MB</td><td>84.21 MB</td><td>18</td><td class="status-active">RUNNING</td><td>LOW</td><td>44.50s</td><td>3 days, 3:50:29</td><td>14:36:24</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr><tr><td>11372</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.45 MB</td><td>1.84 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>6.84s</td><td>3 days, 3:51:01</td><td>14:35:53</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>11612</td><td>conhost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.000</td><td>0.02 MB</td><td>1.12 MB</td><td>2</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.05s</td><td>1:34:14</td><td>16:52:39</td><td>C:\Windows\System32\conhost.exe</td></tr><tr><td>11736</td><td>RadeonSoftware.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.150</td><td>9.13 MB</td><td>169.43 MB</td><td>38</td><td class="status-active">RUNNING</td><td>LOW</td><td>104.36s</td><td>3 days, 3:50:59</td><td>14:35:55</td><td>...r4m\radeonsoftware\RadeonSoftware.exe</td></tr><tr><td>11800</td><td>SearchHost.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.142</td><td>8.66 MB</td><td>53.76 MB</td><td>15</td><td class="status-active">RUNNING</td><td>LOW</td><td>64.20s</td><td>3 days, 3:50:36</td><td>14:36:17</td><td>...ient.CBS_cw5n1h2txyewy\SearchHost.exe</td></tr><tr><td>11956</td><td>svchost.exe</td><td>SYSTEM</td><td>0.00</td><td>0.007</td><td>0.45 MB</td><td>1.90 MB</td><td>5</td><td class="status-active">RUNNING</td><td>LOW</td><td>0.86s</td><td>2 days, 3:47:32</td><td>14:39:21</td><td>C:\Windows\System32\svchost.exe</td></tr><tr><td>12072</td><td>msedgewebview2.exe</td><td>DESKTOP-EU32D3F\donha</td><td>0.00</td><td>0.007</td><td>0.43 MB</td><td>2.21 MB</td><td>8</td><td class="status-active">RUNNING</td><td>LOW</td><td>1.12s</td><td>3 days, 3:50:30</td><td>14:36:23</td><td>...tion\142.0.3595.53\msedgewebview2.exe</td></tr></tbody></table></div></div>
+            <div class="footer">
+                <p>> SCAN COMPLETED: 18:27:00</p>
+                <p>> SYSTEM SCANNER v4.0 | SABARI425 SECURITY | ACCESS LEVEL: ROOT</p>
+                <p style="margin-top: 10px; color: #00ff00; font-size: 0.8em;">
+                    "The quieter you become, the more you are able to hear."
+                </p>
+            </div>
+        </div>
+
+        <script>
+            // Matrix rain effect
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.classList.add('matrix-rain');
+            document.getElementById('matrixRain').appendChild(canvas);
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const chars = "01010101010101010101";
+            const charSize = 14;
+            const columns = canvas.width / charSize;
+            const drops = [];
+
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * canvas.height;
+            }
+
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 10, 0, 0.04)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#00ff00';
+                ctx.font = charSize + 'px "Share Tech Mono", monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    const opacity = Math.random() * 0.7 + 0.3;
+                    ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;
+                    ctx.fillText(text, i * charSize, drops[i] * charSize);
+
+                    if (drops[i] * charSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            setInterval(drawMatrix, 35);
+
+            // Hacker typing effect
+            document.addEventListener('DOMContentLoaded', function() {
+                const elements = document.querySelectorAll('.section h2');
+                elements.forEach((element, index) => {
+                    setTimeout(() => {
+                        element.style.animation = 'typing 3s steps(40, end), blink-caret 0.8s step-end infinite';
+                    }, index * 300);
+                });
+
+                // Add interactive features to tables
+                const tables = document.querySelectorAll('table');
+                tables.forEach(table => {
+                    const headers = table.querySelectorAll('th');
+                    headers.forEach((header, index) => {
+                        header.style.cursor = 'pointer';
+                        header.title = 'Click to sort data';
+                        header.addEventListener('click', () => {
+                            sortTable(table, index);
+                        });
+                    });
+                });
+
+                function sortTable(table, column) {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    const isNumeric = (text) => !isNaN(parseFloat(text)) && isFinite(text);
+
+                    rows.sort((a, b) => {
+                        const aText = a.cells[column].textContent.trim();
+                        const bText = b.cells[column].textContent.trim();
+
+                        if (isNumeric(aText) && isNumeric(bText)) {
+                            return parseFloat(aText) - parseFloat(bText);
+                        }
+
+                        return aText.localeCompare(bText);
+                    });
+
+                    // Remove existing rows
+                    rows.forEach(row => tbody.removeChild(row));
+
+                    // Add sorted rows
+                    rows.forEach(row => tbody.appendChild(row));
+                }
+
+                // Add corner animations
+                const corners = document.querySelectorAll('.corner');
+                corners.forEach((corner, index) => {
+                    setInterval(() => {
+                        corner.style.boxShadow = '0 0 10px #00ff00';
+                        setTimeout(() => {
+                            corner.style.boxShadow = 'none';
+                        }, 500);
+                    }, 2000 + index * 500);
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        </script>
+    </body>
+    </html>
+    
